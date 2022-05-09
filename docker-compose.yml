@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    ports:
+      - 8123:8123
+    volumes:
+      - ./clickhouse_data:/var/lib/clickhouse
+    networks:
+      - tinkoff
+    restart: always
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    volumes: 
+      - ./api:/app
+    env_file: ./api/.env
+    networks:
+      - tinkoff
+    restart: on-failure
+    ports:
+      - 8020:80
+    depends_on:
+      - clickhouse
+networks:
+  tinkoff:
+    external: true
+    driver: bridge
+
